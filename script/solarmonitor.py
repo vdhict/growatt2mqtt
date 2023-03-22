@@ -99,4 +99,5 @@ while True:
         time.sleep(interval)
     else:
         # If all the inverters are not online because no power is being generated then we sleep for 1 min
+        print('All inverters are offline .. Sleeping')
         time.sleep(offline_interval)
