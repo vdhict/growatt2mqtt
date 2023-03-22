@@ -1,0 +1,17 @@
+[query]
+interval = 1
+offline_interval = 60
+error_interval = 60
+
+[solarmon]
+port = /dev/ttyUSB0
+
+[mqtt]
+host = 172.16.2.122
+port = 1883
+topic = growatt
+clientid = inverter
+
+[inverters.main]
+unit = 1
+measurement = inverter
