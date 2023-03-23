@@ -5,7 +5,7 @@ import os
 import paho.mqtt.client as mqtt
 
 from configparser import RawConfigParser
-from pymodbus.client.serial import ModbusSerialClient as ModbusClient
+from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 
 from growatt import Growatt
 
