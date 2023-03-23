@@ -1,7 +1,7 @@
 import datetime
 from pymodbus.exceptions import ModbusIOException
 
-# Status and Codes
+# Codes
 StateCodes = {
     0: 'Waiting',
     1: 'Normal',
@@ -180,3 +180,49 @@ class Growatt:
         # info = merge_dicts(info, self.read_fault_table('GridFault', 90, 5))
 
         return info
+
+    # def read_fault_table(self, name, base_index, count):
+    #     fault_table = {}
+    #     for i in range(0, count):
+    #         fault_table[name + '_' + str(i)] = self.read_fault_record(base_index + i * 5)
+    #     return fault_table
+    #
+    # def read_fault_record(self, index):
+    #     row = self.client.read_input_registers(index, 5, unit=self.unit)
+    #     # TODO: Figure out how to read the date for these records?
+    #     print(row.registers[0],
+    #             ErrorCodes[row.registers[0]],
+    #             '\n',
+    #             row.registers[1],
+    #             row.registers[2],
+    #             row.registers[3],
+    #             '\n',
+    #             2000 + (row.registers[1] >> 8),
+    #             row.registers[1] & 0xFF,
+    #             row.registers[2] >> 8,
+    #             row.registers[2] & 0xFF,
+    #             row.registers[3] >> 8,
+    #             row.registers[3] & 0xFF,
+    #             row.registers[4],
+    #             '\n',
+    #             2000 + (row.registers[1] >> 4),
+    #             row.registers[1] & 0xF,
+    #             row.registers[2] >> 4,
+    #             row.registers[2] & 0xF,
+    #             row.registers[3] >> 4,
+    #             row.registers[3] & 0xF,
+    #             row.registers[4]
+    #           )
+    #     return {
+    #         'FaultCode': row.registers[0],
+    #         'Fault': ErrorCodes[row.registers[0]],
+    #         #'Time': int(datetime.datetime(
+    #         #    2000 + (row.registers[1] >> 8),
+    #         #    row.registers[1] & 0xFF,
+    #         #    row.registers[2] >> 8,
+    #         #    row.registers[2] & 0xFF,
+    #         #    row.registers[3] >> 8,
+    #         #    row.registers[3] & 0xFF
+    #         #).timestamp()),
+    #         'Value': row.registers[4]
+    #     }
