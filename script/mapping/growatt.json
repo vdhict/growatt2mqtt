@@ -1,0 +1,272 @@
+{
+    "registerGroups": [
+        {
+            "start": 0,
+            "length": 33,
+            "registerMap": {
+                "StatusCode": {
+                    "id": 0,
+                    "type": "number",
+                    "name": "Inverter StatusCode"
+                },
+                "Status": {
+                    "id": 0,
+                    "type": "string",
+                    "name": "Inverter Status"
+                },
+                "Ppv": {
+                    "id": 1,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV Power",
+                    "unit": "w",
+                    "class": "power"
+                },
+                "Vpv1": {
+                    "id": 3,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "PV1 voltage",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "PV1Curr": {
+                    "id": 4,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "PV1 input current",
+                    "unit": "a",
+                    "class": "current"
+                },
+                "PV1Watt": {
+                    "id": 5,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV1 input watt",
+                    "unit": "w",
+                    "class": "power"
+                },
+                "Vpv2": {
+                    "id": 7,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "PV2 voltage",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "PV2Curr": {
+                    "id": 8,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "PV2 input current",
+                    "unit": "a",
+                    "class": "current"
+                },
+                "PV2Watt": {
+                    "id": 9,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV2 input watt",
+                    "unit": "w",
+                    "class": "power"
+                },
+                "Pac": {
+                    "id": 11,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "Output power",
+                    "unit": "w",
+                    "class": "power"
+                },
+                "Fac": {
+                    "id": 13,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.01,
+                    "name": "Grid AC Frequency",
+                    "unit": "Hz",
+                    "class": "frequency"
+                },
+                "Vac1": {
+                    "id": 14,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "Grid AC Voltage",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "Iac1": {
+                    "id": 15,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "Grid Output Current",
+                    "unit": "a",
+                    "class": "current"
+                },
+                "Pac1": {
+                    "id": 16,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "Grid Output Power",
+                    "unit": "w",
+                    "class": "power"
+                },
+                "EnergyToday": {
+                    "id": 26,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "Today generated energy today",
+                    "unit": "kwh",
+                    "class": "energy"
+                },
+                "EnergyTotal": {
+                    "id": 28,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "Total generated energy",
+                    "unit": "kwh",
+                    "class": "energy"
+                },
+                "TimeTotal": {
+                    "id": 30,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.5,
+                    "name": "Work time total",
+                    "unit": "s",
+                    "class": "duration"
+                },
+                "Temp": {
+                    "id": 32,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "Inverter Temperature",
+                    "unit": "°C",
+                    "class": "temperature"
+                }
+            }
+        },
+        {
+            "start": 33,
+            "length": 8,
+            "registerMap": {
+                "ISOFault": {
+                    "id": 0,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "ISO Fault value",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "GFCIFault": {
+                    "id": 1,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 1,
+                    "name": "GFCI fault Value",
+                    "unit": "mA",
+                    "class": "current"
+                },
+                "DCIFault": {
+                    "id": 2,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.01,
+                    "name": "DCI fault Value",
+                    "unit": "A",
+                    "class": "current"
+                },
+                "VpvFault": {
+                    "id": 3,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "Vpv fault Value",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "VacFault": {
+                    "id": 4,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "Vac fault Value",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "VacFault": {
+                    "id": 5,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.01,
+                    "name": "Fac fault Value",
+                    "unit": "Hz",
+                    "class": "frequency"
+                },
+                "TempFault": {
+                    "id": 6,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.01,
+                    "name": "Temp fault Value",
+                    "unit": "°C",
+                    "class": "temperature"
+                },
+                "FaultCode": {
+                    "id": 7,
+                    "type": "number",
+                    "name": "Inverter FaultCode"
+                },
+                "Fault": {
+                    "id": 7,
+                    "type": "string",
+                    "name": "Inverter Fault"
+                }
+            }
+        }
+    ],
+    "StateCodes" : {
+        "0": "Waiting",
+        "1": "Normal",
+        "3": "Fault"
+    },
+    "ErrorCodes": {
+        "0": "None",
+        "24": "Auto Test Failed",
+        "25": "No AC Connection",
+        "26": "PV Isolation Low",
+        "27": "Residual Current High",
+        "28": "DC Current High",
+        "29": "PV Voltage High",
+        "30": "AC Voltage Outrange",
+        "31": "AC Freq Outrange",
+        "32": "Module Hot"
+    },
+    "DeratingMode": {
+        "0": "No Derating",
+        "1": "PV",
+        "2": "",
+        "3": "Vac",
+        "4": "Fac",
+        "5": "Tboost",
+        "6": "Tinv",
+        "7": "Control",
+        "8": "*LoadSpeed",
+        "9": "*OverBackByTime"
+    }
+}

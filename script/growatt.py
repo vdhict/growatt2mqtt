@@ -1,4 +1,7 @@
 import datetime
+import json
+import os
+from configparser import RawConfigParser
 from pymodbus.exceptions import ModbusIOException
 
 # Codes
@@ -25,7 +28,7 @@ for i in range(1, 24):
     ErrorCodes[i] = "Error Code: %s" % str(99 + i)
 
 DeratingMode = {
-    0: 'No Deratring',
+    0: 'No Derating',
     1: 'PV',
     2: '',
     3: 'Vac',
@@ -37,17 +40,32 @@ DeratingMode = {
     9: '*OverBackByTime',
 }
 
+settings = RawConfigParser()
+settings.read(os.path.dirname(os.path.realpath(__file__)) + '/solarmonitor.cfg')
+
+deviceregistersmapping = settings.get('mapping', 'devicemap')
+
+with open(os.path.dirname(os.path.realpath(__file__)) + "/mapping/" + deviceregistersmapping) as f:
+    mapping = json.load(f)
+
 def read_single(row, index, unit=10):
     return float(row.registers[index]) / unit
 
 def read_double(row, index, unit=10):
     return float((row.registers[index] << 16) + row.registers[index + 1]) / unit
 
+def read_single_mul(row, index, unit=0.1):
+    return float(row.registers[index]) * unit
+
+def read_double_mul(row, index, unit=0.1):
+    return float((row.registers[index] << 16) + row.registers[index + 1]) * unit
+
 def merge(*dict_args):
     result = {}
     for dictionary in dict_args:
         result.update(dictionary)
     return result
+
 
 class Growatt:
     def __init__(self, client, name, unit):
@@ -70,10 +88,31 @@ class Growatt:
         print('\tUnit: ' + str(self.unit))
         print('\tModbus Version: ' + str(self.modbusVersion))
 
+    def get_config(self):
+
+        config = {
+            'topic': 'homeassistant/sensor/growattmqtt/config',
+            'payload': {'name': 'Growatt MQTT', 'object_id': 'growatt_inverter_' + str(self.unit)}
+        }
+
+        for reg in mapping['registerGroups']:
+            regMap = reg['registerMap']
+            for map in regMap:
+                config = merge(config, {
+                        'topic': 'homeassistant/sensor/growatt_' + map + '/config',
+                        'payload': '{"device_class" : "' + regMap[map]['class'] + '","name" : "'+ regMap[map]['name'] + '","state_topic" : "inverter/growattmqtt/'+map+'","unit_of_measurement" : "' + regMap[map]['unit']+'", "unique_id": "growatt_'+map+'", "object_id": "growatt_'+map+'", "device_id": "growatt_inverter_'+str(self.unit)+'" }',
+                        'retain': True
+                }
+                )
+
+
+        return config
+
     def read(self):
         row = self.client.read_input_registers(0, 33, unit=self.unit)
         if type(row) is ModbusIOException:
             return None
+
 
         # http://www.growatt.pl/dokumenty/Inne/Growatt%20PV%20Inverter%20Modbus%20RS485%20RTU%20Protocol%20V3.04.pdf
         #                                           # Unit,     Variable Name,      Description
