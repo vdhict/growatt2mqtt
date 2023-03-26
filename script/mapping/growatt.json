@@ -7,12 +7,16 @@
                 "StatusCode": {
                     "id": 0,
                     "type": "number",
-                    "name": "Inverter StatusCode"
+                    "name": "Inverter StatusCode",
+                    "unit": "",
+                    "class": ""
                 },
                 "Status": {
                     "id": 0,
                     "type": "string",
-                    "name": "Inverter Status"
+                    "name": "Inverter Status",
+                    "unit": "",
+                    "class": ""
                 },
                 "Ppv": {
                     "id": 1,
@@ -209,7 +213,7 @@
                     "unit": "v",
                     "class": "voltage"
                 },
-                "VacFault": {
+                "FacFault": {
                     "id": 5,
                     "type": "number",
                     "words": 1,
@@ -230,12 +234,91 @@
                 "FaultCode": {
                     "id": 7,
                     "type": "number",
-                    "name": "Inverter FaultCode"
+                    "name": "Inverter FaultCode",
+                    "unit": "",
+                    "class": ""
                 },
                 "Fault": {
                     "id": 7,
                     "type": "string",
-                    "name": "Inverter Fault"
+                    "name": "Inverter Fault",
+                    "unit": "",
+                    "class": ""
+                }
+            }
+        },
+        {
+            "start": 42,
+            "length": 2,
+            "registerMap": {
+                "PBusV": {
+                    "id": 0,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 0.1,
+                    "name": "P Bus Voltage",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "NBusV": {
+                    "id": 1,
+                    "type": "number",
+                    "words": 1,
+                    "mul": 1,
+                    "name": "N Bus Voltage",
+                    "unit": "v",
+                    "class": "voltage"
+                }
+            }
+        },
+        {
+            "start": 33,
+            "length": 8,
+            "registerMap": {
+                "Epv1_today": {
+                    "id": 0,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV1 Energy today",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "Epv1_total": {
+                    "id": 2,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV1 Energy total",
+                    "unit": "kwh",
+                    "class": "energy"
+                },
+                "Epv2_today": {
+                    "id": 4,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV2 Energy today",
+                    "unit": "v",
+                    "class": "voltage"
+                },
+                "Epv2_total": {
+                    "id": 6,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV2 Energy total",
+                    "unit": "kwh",
+                    "class": "energy"
+                },
+                "Epv_total": {
+                    "id": 8,
+                    "type": "number",
+                    "words": 2,
+                    "mul": 0.1,
+                    "name": "PV Energy total",
+                    "unit": "kwh",
+                    "class": "energy"
                 }
             }
         }
