@@ -1,4 +1,5 @@
 import json
+import sys
 import time
 import yaml
 import paho.mqtt.client as mqtt
@@ -9,6 +10,68 @@ def on_connect(client, userdata, flags, rc):
 
 def read_modbus_registers(client, start, length):
     return client.read_input_registers(start, length, unit=1)
+
+def load_config(config_file):
+    with open(config_file, "r") as file:
+        config = yaml.safe_load(file)
+    return config
+
+
+def connect_mqtt(mqtt_config):
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT broker")
+        else:
+            print(f"Failed to connect to MQTT broker, return code: {rc}")
+
+    client = mqtt.Client()
+    client.username_pw_set(mqtt_config["username"], mqtt_config["password"])
+    client.on_connect = on_connect
+    client.connect(mqtt_config["host"], mqtt_config["port"])
+    client.loop_start()
+
+    return client
+
+
+def connect_modbus(modbus_config):
+    client = ModbusSerialClient(
+        method="rtu",
+        port=modbus_config["port"],
+        baudrate=modbus_config["baudrate"],
+        stopbits=modbus_config["stopbits"],
+        bytesize=modbus_config["bytesize"],
+        parity=modbus_config["parity"],
+        timeout=modbus_config["timeout"],
+    )
+
+    if client.connect():
+        print("Connected to Modbus device")
+    else:
+        print("Failed to connect to Modbus device")
+        sys.exit(1)
+
+    return client
+
+def mqtt_autodiscovery(mqtt_client, autodiscover_prefix, inverter_name, registers_info):
+    for register_group in registers_info["registerGroups"]:
+        register_map = register_group["registerMap"]
+        for register_key, register_info in register_map.items():
+            if "name" in register_info and "unit" in register_info and "class" in register_info:
+                topic = f"{autodiscover_prefix}/sensor/{inverter_name}/{register_key}/config"
+                payload = {
+                    "name": f"{inverter_name} {register_info['name']}",
+                    "unit_of_measurement": register_info["unit"],
+                    "state_topic": f"{config['mqtt']['base_topic']}/{inverter_name}/{register_key}",
+                    "device_class": register_info["class"],
+                    "unique_id": f"{inverter_name}_{register_key}",
+                    "device": {
+                        "name": inverter_name,
+                        "identifiers": f"{inverter_name}_growatt_inverter",
+                        "manufacturer": "Growatt",
+                        "model": "Growatt 4000TL",
+                    },
+                }
+                mqtt_client.publish(topic, json.dumps(payload), retain=True)
 
 def main():
     config = load_config("config.yaml")
