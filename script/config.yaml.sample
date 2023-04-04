@@ -1,0 +1,22 @@
+mqtt:
+  host: your_mqtt_broker_host
+  port: 1883
+  username: your_mqtt_username
+  password: your_mqtt_password
+  client_id: growatt_mqtt
+  topic_prefix: growatt
+  device_id: growatt_4000tl
+  device_name: Growatt 4000TL Inverter
+
+modbus:
+  method: rtu
+  port: /dev/ttyUSB0
+  stopbits: 1
+  bytesize: 8
+  parity: N
+  baudrate: 9600
+  timeout: 1
+
+update_interval: 1
+offline_interval: 60
+error_interval: 60
