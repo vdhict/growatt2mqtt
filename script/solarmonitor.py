@@ -1,98 +1,63 @@
-#!/usr/bin/env python3
-
+import json
 import time
-import os
+import yaml
 import paho.mqtt.client as mqtt
-
-from configparser import RawConfigParser
-from pymodbus.client.sync import ModbusSerialClient as ModbusClient
-
-from growatt import Growatt
-
-settings = RawConfigParser()
-settings.read(os.path.dirname(os.path.realpath(__file__)) + '/solarmonitor.cfg')
-
-interval = settings.getint('query', 'interval', fallback=1)
-offline_interval = settings.getint('query', 'offline_interval', fallback=60)
-error_interval = settings.getint('query', 'error_interval', fallback=60)
-
-mqtt_host = settings.get('mqtt', 'host')
-mqtt_port = settings.getint('mqtt', 'port')
-mqtt_topic = settings.get('mqtt','topic', fallback = 'growatt')
-mqtt_clientid = settings.get('mqtt','clientid', fallback='inverter')
-
-# Clients
-
-print('Connect to MQTT broker... ', end='')
+from pymodbus.client.sync import ModbusSerialClient
 
 def on_connect(client, userdata, flags, rc):
-    if rc==0:
-        print("connected OK to MQTT Returned code=",rc)
-    else:
-        print("Bad connection Returned code=",rc)
+    print(f"Connected to MQTT broker with result code {rc}")
 
-mqtt = mqtt.Client(mqtt_clientid)
-mqtt.on_connect = on_connect
-mqtt.connect(mqtt_host, mqtt_port)
-mqtt.loop_start()
-time.sleep(5)
+def read_modbus_registers(client, start, length):
+    return client.read_input_registers(start, length, unit=1)
 
-print('Setup Serial Connection... ', end='')
-port = settings.get('solarmon', 'port', fallback='/dev/ttyUSB0')
-client = ModbusClient(method='rtu', port=port, baudrate=9600, stopbits=1, parity='N', bytesize=8, timeout=1)
-client.connect()
-print('Done!')
+def main():
+    config = load_config("config.yaml")
+    mqtt_client = connect_mqtt(config["mqtt"])
+    modbus_client = connect_modbus(config["modbus"])
 
-print('Loading inverter... ')
+    registers_info = config["registers"]
+    base_topic = config["mqtt"]["base_topic"]
+    autodiscover_prefix = config["mqtt"]["autodiscover_prefix"]
+    inverter_name = config["inverter_name"]
+    offline_wait_interval = config["modbus"]["offline_wait_interval"]
 
-unit = settings.get('inverter','unit', fallback='1')
-measurement = settings.get('inverter','measurement', fallback='measurement')
-growatt = Growatt(client, name, unit)
-growatt.print_info()
-inverter = {
-        'error_sleep': 0,
-        'growatt': growatt,
-        'measurement': measurement
-    }
-print('Done!')
+    mqtt_autodiscovery(mqtt_client, autodiscover_prefix, inverter_name, registers_info)
 
+    while True:
+        for register_group in registers_info["registerGroups"]:
+            start = register_group["start"]
+            length = register_group["length"]
 
-while True:
-    online = False
-    # If this inverter errored then we wait a bit before trying again
-    if inverter['error_sleep'] > 0:
-        inverter['error_sleep'] -= interval
-        continue
+            try:
+                response = read_modbus_registers(modbus_client, start, length)
+            except Exception as e:
+                print(f"Error reading modbus registers: {e}")
+                print(f"Waiting {offline_wait_interval} seconds before trying again")
+                time.sleep(offline_wait_interval)
+                continue
 
-    growatt = inverter['growatt']
-    try:
-        now = time.time()
-        info = growatt.read()
+            values = response.registers
+            register_map = register_group["registerMap"]
 
-        if info is None:
-            continue
+            for register_key, register_info in register_map.items():
+                if "words" in register_info:
+                    words = register_info["words"]
+                else:
+                    words = 1
 
-        # Mark that at least one inverter is online so we should continue collecting data
-        online = True
+                index = register_info["id"]
+                if words == 1:
+                    value = float(values[index])
+                else:
+                    value = float((values[index] << 16) + values[index + 1])
 
-        points = [{
-            'time': int(now),
-            'measurement': inverter['measurement'],
-            "fields": info
-        }]
+                if "mul" in register_info:
+                    value *= register_info["mul"]
 
-        print(growatt.name)
-        print(points)
+                topic = f"{base_topic}/{inverter_name}/{register_key}"
+                mqtt_client.publish(topic, value)
 
+        time.sleep(config["update_interval"])
 
-    except Exception as err:
-        print(growatt.name)
-        print(err)
-        inverter['error_sleep'] = error_interval
-
-    if online:
-        time.sleep(interval)
-    else:
-        # If all the inverters are not online because no power is being generated then we sleep for 1 min
-        print('All inverters are offline .. Sleeping')
-        time.sleep(offline_interval)
+if __name__ == "__main__":
+    main()
