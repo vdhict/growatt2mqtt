@@ -1,5 +1,7 @@
 import json
 import sys
+import os
+import pathlib
 import time
 import yaml
 import paho.mqtt.client as mqtt
@@ -11,11 +13,10 @@ def on_connect(client, userdata, flags, rc):
 def read_modbus_registers(client, start, length):
     return client.read_input_registers(start, length, unit=1)
 
-def load_config(config_file):
-    with open(config_file, "r") as file:
-        config = yaml.safe_load(file)
-    return config
-
+def load_yamlfile(yaml_file):
+    with open(yaml_file, "r") as file:
+        content = yaml.safe_load(file)
+    return content
 
 def connect_mqtt(mqtt_config):
     def on_connect(client, userdata, flags, rc):
@@ -25,7 +26,6 @@ def connect_mqtt(mqtt_config):
             print(f"Failed to connect to MQTT broker, return code: {rc}")
 
     client = mqtt.Client()
-    client.username_pw_set(mqtt_config["username"], mqtt_config["password"])
     client.on_connect = on_connect
     client.connect(mqtt_config["host"], mqtt_config["port"])
     client.loop_start()
@@ -52,39 +52,59 @@ def connect_modbus(modbus_config):
 
     return client
 
-def mqtt_autodiscovery(mqtt_client, autodiscover_prefix, inverter_name, registers_info):
+def mqtt_autodiscovery(mqtt_client, base_topic, autodiscover_prefix, inverter_name, inverter_model, registers_info):
     for register_group in registers_info["registerGroups"]:
         register_map = register_group["registerMap"]
         for register_key, register_info in register_map.items():
             if "name" in register_info and "unit" in register_info and "class" in register_info:
                 topic = f"{autodiscover_prefix}/sensor/{inverter_name}/{register_key}/config"
-                payload = {
-                    "name": f"{inverter_name} {register_info['name']}",
-                    "unit_of_measurement": register_info["unit"],
-                    "state_topic": f"{config['mqtt']['base_topic']}/{inverter_name}/{register_key}",
-                    "device_class": register_info["class"],
-                    "unique_id": f"{inverter_name}_{register_key}",
-                    "device": {
-                        "name": inverter_name,
-                        "identifiers": f"{inverter_name}_growatt_inverter",
-                        "manufacturer": "Growatt",
-                        "model": "Growatt 4000TL",
-                    },
-                }
-                mqtt_client.publish(topic, json.dumps(payload), retain=True)
+                if "stateclass" in register_info:
+                    payload = {
+                        "name": f"{inverter_name} {register_info['name']}",
+                        "unit_of_measurement": register_info["unit"],
+                        "state_topic": f"{base_topic}/{inverter_name}/{register_key}",
+                        "state_class": register_info["stateclass"],
+                        "device_class": register_info["class"],
+                        "unique_id": f"{inverter_name}_{register_key}",
+                        "device": {
+                            "name": f"{inverter_name}",
+                            "identifiers": f"{inverter_name}_growatt_inverter",
+                            "manufacturer": "Growatt",
+                            "model": f"{inverter_model}",
+                        },
+                    }
+                else:
+                    payload = {
+                        "name": f"{inverter_name} {register_info['name']}",
+                        "unit_of_measurement": register_info["unit"],
+                        "state_topic": f"{base_topic}/{inverter_name}/{register_key}",
+                        "device_class": register_info["class"],
+                        "unique_id": f"{inverter_name}_{register_key}",
+                        "device": {
+                            "name": f"{inverter_name}",
+                            "identifiers": f"{inverter_name}_growatt_inverter",
+                            "manufacturer": "Growatt",
+                            "model": f"{inverter_model}",
+                        },
+                    }
+
+            mqtt_client.publish(topic, json.dumps(payload), retain=True)
 
 def main():
-    config = load_config("config.yaml")
+    config_path = os.path.join(pathlib.Path(__file__).parent.absolute(), "config.yaml")
+    registers_path = os.path.join(pathlib.Path(__file__).parent.absolute(), "registers.yaml")
+    config = load_yamlfile(config_path)
+    registers_info = load_yamlfile(registers_path)
     mqtt_client = connect_mqtt(config["mqtt"])
     modbus_client = connect_modbus(config["modbus"])
 
-    registers_info = config["registers"]
     base_topic = config["mqtt"]["base_topic"]
     autodiscover_prefix = config["mqtt"]["autodiscover_prefix"]
-    inverter_name = config["inverter_name"]
-    offline_wait_interval = config["modbus"]["offline_wait_interval"]
+    inverter_name = config["inverter"]["inverter_name"]
+    inverter_model= config["inverter"]["inverter_model"]
+    offline_wait_interval = config["offline_wait_interval"]
 
-    mqtt_autodiscovery(mqtt_client, autodiscover_prefix, inverter_name, registers_info)
+    mqtt_autodiscovery(mqtt_client, base_topic, autodiscover_prefix, inverter_name, inverter_model, registers_info)
 
     while True:
         for register_group in registers_info["registerGroups"]:
