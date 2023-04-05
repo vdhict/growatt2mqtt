@@ -1,12 +1,13 @@
 mqtt:
-  host: your_mqtt_broker_host
+  host: 192.168.0.1
   port: 1883
-  username: your_mqtt_username
-  password: your_mqtt_password
   client_id: growatt_mqtt
-  topic_prefix: growatt
-  device_id: growatt_4000tl
-  device_name: Growatt 4000TL Inverter
+  base_topic: growatt
+  autodiscover_prefix: homeassistant
+
+inverter:
+  inverter_name: growatt_4000tl
+  inverter_model: Growatt 4000TL Inverter
 
 modbus:
   method: rtu
@@ -17,6 +18,6 @@ modbus:
   baudrate: 9600
   timeout: 1
 
-update_interval: 1
-offline_interval: 60
+update_interval: 5
+offline_wait_interval: 60
 error_interval: 60
