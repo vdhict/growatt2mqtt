@@ -115,8 +115,9 @@ registerGroups:
         type: number
         words: 2
         mul: 0.1
-        name: Today generated energy today
-        unit: kwh
+        name: Today generated energy
+        unit: kWh
+        stateclass: total_increasing
         class: energy
       EnergyTotal:
         id: 28
@@ -124,7 +125,8 @@ registerGroups:
         words: 2
         mul: 0.1
         name: Total generated energy
-        unit: kwh
+        unit: kWh
+        stateclass: total
         class: energy
       TimeTotal:
         id: 30
@@ -213,27 +215,8 @@ registerGroups:
         name: Inverter Fault
         unit: ''
         class: ''
-  - start: 42
-    length: 2
-    registerMap:
-      PBusV:
-        id: 0
-        type: number
-        words: 1
-        mul: 0.1
-        name: P Bus Voltage
-        unit: v
-        class: voltage
-      NBusV:
-        id: 1
-        type: number
-        words: 1
-        mul: 1
-        name: N Bus Voltage
-        unit: v
-        class: voltage
-  - start: 33
-    length: 8
+  - start: 48
+    length: 16
     registerMap:
       Epv1_today:
         id: 0
@@ -241,15 +224,15 @@ registerGroups:
         words: 2
         mul: 0.1
         name: PV1 Energy today
-        unit: v
-        class: voltage
+        unit: kWh
+        class: energy
       Epv1_total:
         id: 2
         type: number
         words: 2
         mul: 0.1
         name: PV1 Energy total
-        unit: kwh
+        unit: kWh
         class: energy
       Epv2_today:
         id: 4
@@ -257,15 +240,15 @@ registerGroups:
         words: 2
         mul: 0.1
         name: PV2 Energy today
-        unit: v
-        class: voltage
+        unit: kWh
+        class: energy
       Epv2_total:
         id: 6
         type: number
         words: 2
         mul: 0.1
         name: PV2 Energy total
-        unit: kwh
+        unit: kWh
         class: energy
       Epv_total:
         id: 8
@@ -273,7 +256,7 @@ registerGroups:
         words: 2
         mul: 0.1
         name: PV Energy total
-        unit: kwh
+        unit: kWh
         class: energy
 StateCodes:
   '0': Waiting
