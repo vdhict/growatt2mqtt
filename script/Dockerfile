@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "pypy3", "-u", "./growatt.py" ]
+CMD [ "pypy3", "-u", "./solarmonitor.py" ]
